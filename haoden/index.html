@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <title>Haoden Chat</title>
+    <meta http-equiv="PRAGMA" content="NO-CACHE" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="log4javascript.js"></script>
+    <script type="text/javascript" src="jquery.phono-redfire.js"></script>
+    <script type="text/javascript" src="haoden_chat.js"></script>
+    <script type="text/javascript">
+	$(document).ready(function() {
+		var Initialized = function() {
+			$('#status').text("初期化完了");
+			$('#join').show();
+			$('#init_div').hide();
+			$('#join_div').show();
+//			alert('Initialized');
+		};
+		var Connected = function() {
+			$('#status').text("会話中...");
+			$('#join').hide();
+			$('#leave').show();
+//			alert('Connected');
+		};
+		var Hangup = function() {
+			$('#status').text("");
+			$('#join').show();
+			$('#leave').hide();
+//			alert('Hangup');
+		};
+		var Error = function(err) {
+			alert(err);
+		};
+		$('#join').click(function(ev) {
+			chat.JoinRoom($('#room').val(), Connected, Hangup, Error);
+			$('#status').text("接続中...");
+		});
+		$('#leave').click(function(ev) {
+			chat.LeaveRoom();
+		});
+		$(window).bind("beforeunload", function(e) {
+			chat.LeaveRoom();
+//			return true;
+		});
+		$('#init').click(function(ev) {
+			var userid = $('#userid').val();
+			var passwd = $('#passwd').val();
+			if (userid && userid != '' && passwd && passwd != '') {
+				chat.setParam('username', userid.replace("@", "\\40"));
+				chat.setParam('password', passwd);
+			}
+			chat.setParam('rtmpServer', 'streaming.asusa.net');
+			chat.setParam('xmppServer', 'streaming.asusa.net');
+			chat.setParam('sipServer', 'msg01.asusa.net');
+			chat.setParam('javaPlugin', 'http://www.historia.private/chat/plugins/audio/phono.audio.jar');
+			chat.setParam('flashPlugin', 'http://www.historia.private/chat/plugins/audio/phono.audio.swf');
+			chat.InitRoom(Initialized);
+			$('#status').text("初期化中...");
+		});
+	});
+	</script>
+</head>
+<body>
+<div id="init_div">
+ユーザーID：<input type="text" id="userid">(空でもOK)<br>
+パスワード：<input type="password" id="passwd">(空でもOK)<br>
+<input type="button" id="init" value="初期化">
+</div>
+<div id="join_div" style="display: none">
+ルームNo.<input type="text" id="room"><input type="button" id="join" style="display: none" value="入室"><input type="button" id="leave" style="display: none" value="退室">
+</div>
+<br>
+<div id="status"></div>
+</body>
+</html>

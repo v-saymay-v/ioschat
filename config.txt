@@ -1,0 +1,142 @@
+#
+# baresip configuration
+#
+
+#------------------------------------------------------------------------------
+
+# Core
+poll_method		select		# poll, select, epoll ..
+
+# Input
+input_device		/dev/event0
+input_port		5555
+
+# SIP
+sip_trans_bsize		128
+#sip_listen		127.0.0.1:5050
+
+# Audio
+#audio_player		alsa,default
+#audio_source		alsa,default
+#audio_alert		alsa,default
+audio_srate		8000-48000
+audio_channels		1-2
+#audio_srate		8000
+#audio_channels		1
+
+# Video
+#video_source		v4l2,/dev/video0
+#video_size		352x288
+#video_bitrate		384000
+#video_fps		25
+#video_selfview		window # {window,pip}
+
+# AVT - Audio/Video Transport
+rtp_tos			184
+#rtp_ports			10000-20000
+#rtp_bandwidth			512-1024 # [kbit/s]
+rtcp_enable			yes
+rtcp_mux			no
+jitter_buffer_delay	5-10		# frames
+
+# Network
+#dns_server		10.0.0.1:53
+#net_interface		eth0
+
+#------------------------------------------------------------------------------
+# Modules
+
+module_path		/usr/local/lib/baresip/modules
+
+# UI Modules
+#module			stdio.so
+module			cons.so
+#module			evdev.so
+
+# Audio codec Modules (in order)
+#module			opus.so
+#module			silk.so
+#module			amr.so
+#module			g7221.so
+#module			g722.so
+module			g711.so
+#module			gsm.so
+#module			l16.so
+#module			speex.so
+#module			celt.so
+#module			bv32.so
+
+# Audio filter Modules (in order)
+# NOTE: AEC should be before Preproc
+#module			sndfile.so
+#module			speex_aec.so
+#module			speex_pp.so
+#module			speex_resamp.so
+#module			plc.so
+module			vumeter.so
+
+# Audio driver Modules
+module			audiounit.so
+#module			coreaudio.so
+#module			portaudio.so
+#module			gst.so
+
+# Video codec Modules (in order)
+#module			avcodec.so
+#module			vpx.so
+
+# Video filter Modules (in order)
+#module			selfview.so
+
+# Video source modules
+#module			qtcapture.so
+#module			quicktime.so
+#module			x11grab.so
+
+# Video display modules
+#module			sdl.so
+#module			opengl.so
+#module			x11.so
+
+# Media NAT modules
+module			stun.so
+module			turn.so
+module			ice.so
+
+# Media encoding modules
+#module			srtp.so
+
+
+#------------------------------------------------------------------------------
+# Temporary Modules (loaded then unloaded)
+
+#module_tmp		uuid.so
+
+
+#------------------------------------------------------------------------------
+# Application Modules
+
+#module_app		auloop.so
+module_app		contact.so
+module_app		menu.so
+#module_app		natbd.so
+#module_app		presence.so
+#module_app		syslog.so
+#module_app		vidloop.so
+
+
+#------------------------------------------------------------------------------
+# Module parameters
+
+
+# Speex codec parameters
+speex_quality		7 # 0-10
+speex_complexity	7 # 0-10
+speex_enhancement	0 # 0-1
+speex_vbr		0 # Variable Bit Rate 0-1
+speex_vad		0 # Voice Activity Detection 0-1
+speex_agc_level	8000
+
+# NAT Behavior Discovery
+natbd_server		creytiv.com
+natbd_interval		600		# in seconds

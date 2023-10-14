@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <title>Haoden Chat</title>
+    <ver></ver>
+    <meta http-equiv="PRAGMA" content="NO-CACHE" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="strophe.js"></script>
+    <script type="text/javascript" src="strophe.roster.js"></script>
+    <script type="text/javascript" src="strophe.register.js"></script>
+    <script type="text/javascript">
+	$(document).ready(function() {
+		var connection = new Strophe.Connection("http://streaming.asusa.net:7070/http-bind/");
+		$('#create').click(function(ev) {
+			var nick = $('#nickname').val();
+			var userid = $('#userid').val();
+			var passwd = $('#passwd').val();
+			console.log("Connect to XMPP-Server...");
+
+			var callback = function (status) {
+				console.log('status=' + status);
+				if (status === Strophe.Status.REGISTER) {
+					connection.register.fields.username = userid.replace("@", "\\40");
+					connection.register.fields.name = nick;
+					connection.register.fields.password = passwd;
+					connection.register.submit();
+				} else if (status === Strophe.Status.REGISTERED) {
+					console.log("registered!");
+					connection.register.authenticate();
+					alert("registered!");
+				} else if (status === Strophe.Status.REGIFAIL) {
+					console.log("Register failed!");
+					alert("Register failed!");
+				} else if (status === Strophe.Status.SBMTFAIL) {
+					console.log("Submit failed!");
+					alert("Submit failed!");
+				} else if (status === Strophe.Status.CONNECTED) {
+					$(document).trigger('connected');
+				} else if (status === Strophe.Status.DISCONNECTED) {
+					console.log("Disconnected from XMPP-Server");
+				}
+			};
+			connection.register.connect("streaming.asusa.net", callback, 60, 1);
+		});
+		$('#delete').click(function(ev) {
+			var items = [];
+			var jid = $('#userid').val();
+			var pass = $('#passwd').val();
+			var callback = function (status) {
+				alert(status);
+			};
+			var userCallback = function (status) {
+				connection.roster.remove(jid + "@streaming.asusa.net", callback);
+			};
+			var connCb = function (status) {
+				switch (status) {
+				case Strophe.Status.ERROR:
+					console.log('Strophe.Status.ERROR');
+					break;
+				case Strophe.Status.CONNECTING:
+					console.log('Strophe.Status.CONNECTING');
+					break;
+				case Strophe.Status.CONNFAIL:
+					console.log('Strophe.Status.CONNFAIL');
+					break;
+				case Strophe.Status.AUTHENTICATING:
+					console.log('Strophe.Status.AUTHENTICATING');
+					break;
+				case Strophe.Status.AUTHFAIL:
+					console.log('Strophe.Status.AUTHFAIL');
+					break;
+				case Strophe.Status.CONNECTED:
+					console.log('Strophe.Status.CONNECTED');
+					connection.roster.get(userCallback, '1', items);
+					break;
+				case Strophe.Status.DISCONNECTED:
+					console.log('Strophe.Status.DISCONNECTED');
+					break;
+				case Strophe.Status.DISCONNECTING:
+					console.log('Strophe.Status.DISCONNECTING');
+					break;
+				case Strophe.Status.ATTACHED:
+					console.log('Strophe.Status.ATTACHED');
+					break;
+				}
+			};
+			connection.roster._connection.connect(jid + "@streaming.asusa.net", pass, connCb);
+		});
+	});
+	</script>
+</head>
+<body>
+<div id="init_div">
+ニックネーム：<input type="text" id="nickname"><br>
+ユーザーID：<input type="text" id="userid"><br>
+パスワード：<input type="password" id="passwd"><br>
+<input type="button" id="create" value="作成">
+<input type="button" id="delete" value="削除">
+</div>
+</body>
+</html>
